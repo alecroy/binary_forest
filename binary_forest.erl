@@ -82,7 +82,7 @@ head_tree(#tree{left=Left}) -> head_tree(Left).
 tail_tree(#tree{size=1}) -> [];
 tail_tree(Tree) -> tail_tree(Tree, []).
 
-tail_tree(#tree{left=null}, Trees) -> Trees;
+tail_tree(#tree{size=1}, Trees) -> Trees;
 tail_tree(#tree{left=Left, right=Right}, Trees) ->
     tail_tree(Left, [Right | Trees]).
 
