@@ -1,5 +1,5 @@
 -module(binary_forest).
--export([create/0, create/1, cons/2]).
+-export([create/0, create/1, cons/2, is_empty/1, head/1, tail/1]).
 -include("binary_forest.hrl").
 -include_lib("eunit/include/eunit.hrl").
 
@@ -33,6 +33,19 @@ merge(Tree, [T | Trees]) ->
 	merge(#tree{size=Size, values=Values}, Trees).
 
 
+is_empty(Forest) -> Forest#forest.size == 0.
+
+
+head(#forest{trees=[#tree{values=[Value | _Values]} | _Trees]}) -> Value.
+
+
+tail(Forest = #forest{trees=[]}) -> Forest;
+tail(#forest{size=Size, trees=[#tree{values=[_Value | Values]} | Trees]}) ->
+	SubForest = create(Values),
+	#forest{size=Size - 1, trees=SubForest#forest.trees ++ Trees}.
+
+
+
 
 create_test() ->
 	#forest{size=0, trees=[]} = create(),
@@ -54,4 +67,19 @@ cons_test() ->
 	Three = #forest{size=3, trees=[#tree{size=1, values=[1]},
 	                               #tree{size=2, values=[2, 3]}]},
 	Three = cons(1, cons(2, cons(3, create()))),
+	ok.
+
+is_empty_test() ->
+	true = is_empty(create()),
+	false = is_empty(create([1])),
+	ok.
+
+tail_test() ->
+	#forest{size=0, trees=[]} = tail(create([1])),
+	#forest{size=1, trees=[#tree{size=1, values=[2]}]} = tail(create([1, 2])),
+	ok.
+
+head_test() ->
+	1 = head(create([1])),
+	3 = head(tail(tail(create([1, 2, 3])))),
 	ok.
