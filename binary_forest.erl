@@ -77,9 +77,8 @@ map_tree(Function, Tree = #tree{values=Values}) ->
 
 
 nth_trees(N, [#tree{size=Size} | Trees]) when N > Size ->
-    nth_trees(N - Size, Trees).
-nth_trees(N, [#tree{size=Size, values=Values} | _Trees]) ->
-    lists:nth(N, Values);
+    nth_trees(N - Size, Trees);
+nth_trees(N, [#tree{values=Values} | _Trees]) -> lists:nth(N, Values).
 
 
 
