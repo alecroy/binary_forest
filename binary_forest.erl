@@ -1,6 +1,5 @@
 -module(binary_forest).
--export([create/0, create/1, cons/2, is_empty/1, head/1, tail/1
- % foreach/2,
+-export([create/0, create/1, cons/2, is_empty/1, head/1, tail/1, foreach/2
          % map/2, nth/2, update/3
          ]).
 -include("binary_forest.hrl").
@@ -30,8 +29,8 @@ tail(#forest{size=Size, trees=[Tree | Trees]}) ->
     #forest{size=Size - 1, trees=tail_tree(Tree) ++ Trees}.
 
 
-% foreach(Function, #forest{trees=Trees}) ->
-%     lists:foreach(fun (Tree) -> foreach_tree(Function, Tree) end, Trees).
+foreach(Function, #forest{trees=Trees}) ->
+    lists:foreach(fun (Tree) -> foreach_tree(Function, Tree) end, Trees).
 
 
 % map(Function, Forest = #forest{trees=Trees}) ->
@@ -87,8 +86,10 @@ tail_tree(#tree{left=null}, Trees) -> Trees;
 tail_tree(#tree{left=Left, right=Right}, Trees) ->
     tail_tree(Left, [Right | Trees]).
 
-% foreach_tree(Function, #tree{values=Values}) ->
-%     lists:foreach(Function, Values).
+foreach_tree(Function, #tree{value=null, left=Left, right=Right}) ->
+    foreach_tree(Function, Left),
+    foreach_tree(Function, Right);
+foreach_tree(Function, #tree{value=Value}) -> Function(Value).
 
 
 % map_tree(Function, Tree = #tree{values=Values}) ->
