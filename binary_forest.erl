@@ -68,31 +68,29 @@ tree(Size, Values) ->
 merge(Tree, []) -> [Tree];
 merge(Tree, [T | Trees]) when Tree#tree.size < T#tree.size -> [Tree, T | Trees];
 merge(Tree, [T | Trees]) ->
-    merge(#tree{size=2*Tree#tree.size, left=Tree, right=T}, Trees).
+    merge(#tree{size=2 * Tree#tree.size, left=Tree, right=T}, Trees).
 
 
 head_tree(#tree{size=1, value=Value}) -> Value;
-head_tree(#tree{left=Left}) -> head_tree(Left).
+head_tree(#tree{left=L}) -> head_tree(L).
 
 
 tail_tree(#tree{size=1}) -> [];
 tail_tree(Tree) -> tail_tree(Tree, []).
 
 tail_tree(#tree{size=1}, Trees) -> Trees;
-tail_tree(#tree{left=Left, right=Right}, Trees) ->
-    tail_tree(Left, [Right | Trees]).
+tail_tree(#tree{left=L, right=R}, Trees) -> tail_tree(L, [R | Trees]).
 
 
 foreach_tree(Function, #tree{size=1, value=Value}) -> Function(Value);
-foreach_tree(Function, #tree{left=Left, right=Right}) ->
-    foreach_tree(Function, Left),
-    foreach_tree(Function, Right).
+foreach_tree(Function, #tree{left=L, right=R}) ->
+    foreach_tree(Function, L), foreach_tree(Function, R).
 
 
 map_tree(Function, Tree = #tree{size=1, value=Value}) ->
     Tree#tree{value=Function(Value)};
-map_tree(Function, Tree = #tree{left=Left, right=Right}) ->
-    Tree#tree{left=map_tree(Function, Left), right=map_tree(Function, Right)}.
+map_tree(Function, Tree = #tree{left=L, right=R}) ->
+    Tree#tree{left=map_tree(Function, L), right=map_tree(Function, R)}.
 
 
 nth_trees(N, [Tree = #tree{size=Size} | _Trees]) when N =< Size ->
