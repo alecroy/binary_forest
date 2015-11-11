@@ -1,6 +1,6 @@
 -module(binary_forest).
--export([create/0, create/1, cons/2, is_empty/1, head/1
-    % tail/1, foreach/2,
+-export([create/0, create/1, cons/2, is_empty/1, head/1, tail/1
+ % foreach/2,
          % map/2, nth/2, update/3
          ]).
 -include("binary_forest.hrl").
@@ -25,10 +25,9 @@ is_empty(Forest) -> Forest#forest.size == 0.
 head(#forest{trees=[Tree | _Trees]}) -> head_tree(Tree).
 
 
-% tail(Forest = #forest{trees=[]}) -> Forest;
-% tail(#forest{size=Size, trees=[#tree{values=[_Value | Values]} | Trees]}) ->
-%     SubForest = create(Values),
-%     #forest{size=Size - 1, trees=SubForest#forest.trees ++ Trees}.
+tail(Forest = #forest{trees=[]}) -> Forest;
+tail(#forest{size=Size, trees=[Tree | Trees]}) ->
+    #forest{size=Size - 1, trees=tail_tree(Tree) ++ Trees}.
 
 
 % foreach(Function, #forest{trees=Trees}) ->
@@ -80,6 +79,13 @@ merge(Tree, [T | Trees]) ->
 head_tree(#tree{size=1, value=Value}) -> Value;
 head_tree(#tree{left=Left}) -> head_tree(Left).
 
+
+tail_tree(#tree{size=1}) -> [];
+tail_tree(Tree) -> tail_tree(Tree, []).
+
+tail_tree(#tree{left=null}, Trees) -> Trees;
+tail_tree(#tree{left=Left, right=Right}, Trees) ->
+    tail_tree(Left, [Right | Trees]).
 
 % foreach_tree(Function, #tree{values=Values}) ->
 %     lists:foreach(Function, Values).
@@ -154,10 +160,11 @@ is_empty_test() ->
     ok.
 
 
-% tail_test() ->
-%     #forest{size=0, trees=[]} = tail(create([1])),
-%     #forest{size=1, trees=[#tree{size=1, values=[2]}]} = tail(create([1, 2])),
-%     ok.
+tail_test() ->
+    #forest{size=0, trees=[]} = tail(create([1])),
+    #forest{size=1, trees=[#tree{size=1, value=2, left=null, right=null}]}
+        = tail(create([1, 2])),
+    ok.
 
 
 % head_test() ->
