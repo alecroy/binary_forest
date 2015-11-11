@@ -86,10 +86,10 @@ tail_tree(#tree{left=null}, Trees) -> Trees;
 tail_tree(#tree{left=Left, right=Right}, Trees) ->
     tail_tree(Left, [Right | Trees]).
 
-foreach_tree(Function, #tree{value=null, left=Left, right=Right}) ->
+foreach_tree(Function, #tree{size=1, value=Value}) -> Function(Value);
+foreach_tree(Function, #tree{left=Left, right=Right}) ->
     foreach_tree(Function, Left),
-    foreach_tree(Function, Right);
-foreach_tree(Function, #tree{value=Value}) -> Function(Value).
+    foreach_tree(Function, Right).
 
 
 % map_tree(Function, Tree = #tree{values=Values}) ->
