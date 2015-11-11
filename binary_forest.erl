@@ -64,7 +64,6 @@ tree(Size, Values) ->
     #tree{size=Size, value=null, left=LTree, right=RTree}.
 
 
-
 %% Merge a Tree with other Trees of size 2^k (like adding 1 to a binary number)
 merge(Tree, []) -> [Tree];
 merge(Tree, [T | Trees]) when Tree#tree.size < T#tree.size ->
@@ -83,6 +82,7 @@ tail_tree(Tree) -> tail_tree(Tree, []).
 tail_tree(#tree{size=1}, Trees) -> Trees;
 tail_tree(#tree{left=Left, right=Right}, Trees) ->
     tail_tree(Left, [Right | Trees]).
+
 
 foreach_tree(Function, #tree{size=1, value=Value}) -> Function(Value);
 foreach_tree(Function, #tree{left=Left, right=Right}) ->
