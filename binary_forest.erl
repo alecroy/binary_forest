@@ -66,8 +66,7 @@ tree(Size, Values) ->
 
 %% Merge a Tree with other Trees of size 2^k (like adding 1 to a binary number)
 merge(Tree, []) -> [Tree];
-merge(Tree, [T | Trees]) when Tree#tree.size < T#tree.size ->
-    [Tree] ++ [T | Trees];
+merge(Tree, [T | Trees]) when Tree#tree.size < T#tree.size -> [Tree, T | Trees];
 merge(Tree, [T | Trees]) ->
     merge(#tree{size=2*Tree#tree.size, value=null, left=Tree, right=T}, Trees).
 
