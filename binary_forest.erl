@@ -75,9 +75,7 @@ head_tree(#tree{size=1, value=Value}) -> Value;
 head_tree(#tree{left=L}) -> head_tree(L).
 
 
-tail_tree(#tree{size=1}) -> [];
 tail_tree(Tree) -> tail_tree(Tree, []).
-
 tail_tree(#tree{size=1}, Trees) -> Trees;
 tail_tree(#tree{left=L, right=R}, Trees) -> tail_tree(L, [R | Trees]).
 
