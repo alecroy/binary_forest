@@ -167,10 +167,10 @@ tail_test() ->
     ok.
 
 
-% head_test() ->
-%     1 = head(create([1])),
-%     3 = head(tail(tail(create([1, 2, 3])))),
-%     ok.
+head_test() ->
+    1 = head(create([1])),
+    3 = head(tail(tail(create([1, 2, 3])))),
+    ok.
 
 
 % map_test() ->
