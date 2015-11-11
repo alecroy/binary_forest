@@ -13,7 +13,7 @@ create(List) ->
 
 
 cons(Element, #forest{size=Size, trees=Trees}) ->
-    Tree = #tree{size=1, value=Element, left=null, right=null},
+    Tree = #tree{size=1, value=Element},
     #forest{size=Size + 1, trees=merge(Tree, Trees)}.
 
 
@@ -56,19 +56,19 @@ trees(Length, List, Trees) ->
     {Rest, Values} = lists:split(Length - TreeSize, List), % take values off end
     trees(Length - TreeSize, Rest, [tree(TreeSize, Values) | Trees]).
 
-tree(1, [Value]) -> #tree{size=1, value=Value, left=null, right=null};
+tree(1, [Value]) -> #tree{size=1, value=Value};
 tree(Size, Values) ->
     HalfSize = Size div 2,
     {LValues, RValues} = lists:split(HalfSize, Values),
     {LTree, RTree} = {tree(HalfSize, LValues), tree(HalfSize, RValues)},
-    #tree{size=Size, value=null, left=LTree, right=RTree}.
+    #tree{size=Size, left=LTree, right=RTree}.
 
 
 %% Merge a Tree with other Trees of size 2^k (like adding 1 to a binary number)
 merge(Tree, []) -> [Tree];
 merge(Tree, [T | Trees]) when Tree#tree.size < T#tree.size -> [Tree, T | Trees];
 merge(Tree, [T | Trees]) ->
-    merge(#tree{size=2*Tree#tree.size, value=null, left=Tree, right=T}, Trees).
+    merge(#tree{size=2*Tree#tree.size, left=Tree, right=T}, Trees).
 
 
 head_tree(#tree{size=1, value=Value}) -> Value;
@@ -122,18 +122,15 @@ update_tree(N, Value, Tree = #tree{size=Size, right=R}) ->
 
 create_test() ->
     #forest{size=0, trees=[]} = create(),
-    #forest{size=1, trees=[#tree{size=1, value=1, left=null, right=null}]}
-        = create([1]),
+    #forest{size=1, trees=[#tree{size=1, value=1}]} = create([1]),
     OneTwo = #forest{size=2,
-                     trees=[#tree{size=2, value=null,
-                                  left=#tree{size=1, value=1,
-                                             left=null, right=null},
-                                  right=#tree{size=1, value=2,
-                                              left=null, right=null}}]},
+                     trees=[#tree{size=2,
+                                  left=#tree{size=1, value=1},
+                                  right=#tree{size=1, value=2}}]},
     OneTwo = create([1, 2]),
     [T12] = OneTwo#forest.trees,
-    #forest{size=4, trees=[#tree{size=4, value=null,
-                                 left=T12, right=T12}]} = create([1, 2, 1, 2]),
+    #forest{size=4, trees=[#tree{size=4, left=T12, right=T12}]}
+        = create([1, 2, 1, 2]),
     ok.
 
 
@@ -145,15 +142,11 @@ highest_power_of_2_test() ->
 
 
 cons_test() ->
-    One = #forest{size=1, trees=[#tree{size=1, value=1,
-                                       left=null, right=null}]},
+    One = #forest{size=1, trees=[#tree{size=1, value=1}]},
     One = cons(1, create()),
-    TwoThree = #forest{size=2,
-                       trees=[#tree{size=2, value=null,
-                                    left=#tree{size=1, value=2,
-                                               left=null, right=null},
-                                    right=#tree{size=1, value=3,
-                                                left=null, right=null}}]},
+    TwoThree = #forest{size=2, trees=[#tree{size=2,
+                                            left=#tree{size=1, value=2},
+                                            right=#tree{size=1, value=3}}]},
     {[T1], [T23]} = {One#forest.trees, TwoThree#forest.trees},
     #forest{size=3, trees=[T1, T23]} = cons(1, cons(2, create([3]))),
     ok.
@@ -167,7 +160,7 @@ is_empty_test() ->
 
 tail_test() ->
     #forest{size=0, trees=[]} = tail(create([1])),
-    #forest{size=1, trees=[#tree{size=1, value=2, left=null, right=null}]}
+    #forest{size=1, trees=[#tree{size=1, value=2}]}
         = tail(create([1, 2])),
     ok.
 
