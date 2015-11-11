@@ -33,17 +33,11 @@ tail(#forest{size=Size, trees=[#tree{values=[_Value | Values]} | Trees]}) ->
 foreach(Function, #forest{trees=Trees}) ->
     lists:foreach(fun (Tree) -> foreach_tree(Function, Tree) end, Trees).
 
-foreach_tree(Function, #tree{values=Values}) ->
-    lists:foreach(Function, Values).
-
 
 map(Function, Forest = #forest{trees=Trees}) ->
     NewTrees = lists:map(fun (Tree) -> map_tree(Function, Tree) end, Trees),
     Forest#forest{trees=NewTrees}.
 
-map_tree(Function, Tree = #tree{values=Values}) ->
-    NewValues = lists:map(Function, Values),
-    Tree#tree{values=NewValues}.
 
 nth(N, Forest) -> nth_trees(N, Forest#forest.trees).
 
@@ -71,6 +65,15 @@ merge(Tree, [T | Trees]) ->
     Size = 2 * Tree#tree.size,
     Values = Tree#tree.values ++ T#tree.values,
     merge(#tree{size=Size, values=Values}, Trees).
+
+
+foreach_tree(Function, #tree{values=Values}) ->
+    lists:foreach(Function, Values).
+
+
+map_tree(Function, Tree = #tree{values=Values}) ->
+    NewValues = lists:map(Function, Values),
+    Tree#tree{values=NewValues}.
 
 
 nth_trees(N, [#tree{size=Size} | Trees]) when N > Size ->
