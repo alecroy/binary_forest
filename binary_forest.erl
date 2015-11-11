@@ -1,6 +1,6 @@
 -module(binary_forest).
 -export([create/0, create/1, cons/2, is_empty/1, head/1, tail/1, foreach/2,
-         map/2]).
+         map/2, nth/2]).
 -include("binary_forest.hrl").
 -include_lib("eunit/include/eunit.hrl").
 
@@ -45,6 +45,8 @@ map_tree(Function, Tree = #tree{values=Values}) ->
     NewValues = lists:map(Function, Values),
     Tree#tree{values=NewValues}.
 
+nth(N, Forest) -> nth_trees(N, Forest#forest.trees).
+
 
 
 %%% helpers
@@ -69,6 +71,12 @@ merge(Tree, [T | Trees]) ->
     Size = 2 * Tree#tree.size,
     Values = Tree#tree.values ++ T#tree.values,
     merge(#tree{size=Size, values=Values}, Trees).
+
+
+nth_trees(N, [#tree{size=Size} | Trees]) when N > Size ->
+    nth_trees(N - Size, Trees).
+nth_trees(N, [#tree{size=Size, values=Values} | _Trees]) ->
+    lists:nth(N, Values);
 
 
 
@@ -123,4 +131,10 @@ map_test() ->
     Forest = map(Identity, Forest),
     Squares = create([1, 4, 9, 16, 25]),
     Squares = map(fun (N) -> N * N end, Forest),
+    ok.
+
+
+nth_test() ->
+    1 = nth(1, create([1])),
+    100 = nth(100, create(lists:seq(1, 100))),
     ok.
