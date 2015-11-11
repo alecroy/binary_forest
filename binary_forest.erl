@@ -33,9 +33,8 @@ foreach(Function, #forest{trees=Trees}) ->
     lists:foreach(fun (Tree) -> foreach_tree(Function, Tree) end, Trees).
 
 
-% map(Function, Forest = #forest{trees=Trees}) ->
-%     NewTrees = lists:map(fun (Tree) -> map_tree(Function, Tree) end, Trees),
-%     Forest#forest{trees=NewTrees}.
+map(Function, Forest = #forest{trees=Trees}) ->
+    Forest#forest{trees=[ map_tree(Function, Tree) || Tree <- Trees ]}.
 
 
 % nth(N, Forest) -> nth_trees(N, Forest#forest.trees).
@@ -92,9 +91,10 @@ foreach_tree(Function, #tree{left=Left, right=Right}) ->
     foreach_tree(Function, Right).
 
 
-% map_tree(Function, Tree = #tree{values=Values}) ->
-%     NewValues = lists:map(Function, Values),
-%     Tree#tree{values=NewValues}.
+map_tree(Function, Tree = #tree{size=1, value=Value}) ->
+    Tree#tree{value=Function(Value)};
+map_tree(Function, Tree = #tree{left=Left, right=Right}) ->
+    Tree#tree{left=map_tree(Function, Left), right=map_tree(Function, Right)}.
 
 
 % nth_trees(N, [#tree{size=Size} | Trees]) when N > Size ->
@@ -174,13 +174,13 @@ head_test() ->
     ok.
 
 
-% map_test() ->
-%     Identity = fun (X) -> X end,
-%     Forest = create(lists:seq(1, 5)),
-%     Forest = map(Identity, Forest),
-%     Squares = create([1, 4, 9, 16, 25]),
-%     Squares = map(fun (N) -> N * N end, Forest),
-%     ok.
+map_test() ->
+    Identity = fun (X) -> X end,
+    Forest = create(lists:seq(1, 5)),
+    Forest = map(Identity, Forest),
+    Squares = create([1, 4, 9, 16, 25]),
+    Squares = map(fun (N) -> N * N end, Forest),
+    ok.
 
 
 % nth_test() ->
