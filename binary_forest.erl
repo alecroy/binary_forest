@@ -1,5 +1,6 @@
 -module(binary_forest).
--export([create/0, create/1, cons/2, is_empty/1, head/1, tail/1]).
+-export([create/0, create/1, cons/2, is_empty/1, head/1, tail/1, foreach/2,
+         map/2]).
 -include("binary_forest.hrl").
 -include_lib("eunit/include/eunit.hrl").
 
@@ -27,6 +28,22 @@ tail(Forest = #forest{trees=[]}) -> Forest;
 tail(#forest{size=Size, trees=[#tree{values=[_Value | Values]} | Trees]}) ->
     SubForest = create(Values),
     #forest{size=Size - 1, trees=SubForest#forest.trees ++ Trees}.
+
+
+foreach(Function, #forest{trees=Trees}) ->
+    lists:foreach(fun (Tree) -> foreach_tree(Function, Tree) end, Trees).
+
+foreach_tree(Function, #tree{values=Values}) ->
+    lists:foreach(Function, Values).
+
+
+map(Function, Forest = #forest{trees=Trees}) ->
+    NewTrees = lists:map(fun (Tree) -> map_tree(Function, Tree) end, Trees),
+    Forest#forest{trees=NewTrees}.
+
+map_tree(Function, Tree = #tree{values=Values}) ->
+    NewValues = lists:map(Function, Values),
+    Tree#tree{values=NewValues}.
 
 
 
@@ -97,4 +114,13 @@ tail_test() ->
 head_test() ->
     1 = head(create([1])),
     3 = head(tail(tail(create([1, 2, 3])))),
+    ok.
+
+
+map_test() ->
+    Identity = fun (X) -> X end,
+    Forest = create(lists:seq(1, 5)),
+    Forest = map(Identity, Forest),
+    Squares = create([1, 4, 9, 16, 25]),
+    Squares = map(fun (N) -> N * N end, Forest),
     ok.
