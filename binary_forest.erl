@@ -25,7 +25,7 @@ head(#forest{trees=[Tree | _Trees]}) -> head_tree(Tree).
 
 tail(Forest = #forest{trees=[]}) -> Forest;
 tail(#forest{size=Size, trees=[Tree | Trees]}) ->
-    #forest{size=Size - 1, trees=tail_tree(Tree) ++ Trees}.
+    #forest{size=Size - 1, trees=tail_tree(Tree, Trees)}.
 
 
 foreach(Function, #forest{trees=Trees}) ->
@@ -75,7 +75,6 @@ head_tree(#tree{size=1, value=Value}) -> Value;
 head_tree(#tree{left=L}) -> head_tree(L).
 
 
-tail_tree(Tree) -> tail_tree(Tree, []).
 tail_tree(#tree{size=1}, Trees) -> Trees;
 tail_tree(#tree{left=L, right=R}, Trees) -> tail_tree(L, [R | Trees]).
 
