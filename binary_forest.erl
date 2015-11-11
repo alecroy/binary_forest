@@ -1,7 +1,6 @@
 -module(binary_forest).
--export([create/0, create/1, cons/2, is_empty/1, head/1, tail/1, foreach/2, map/2, nth/2
-    % , update/3
-         ]).
+-export([create/0, create/1, cons/2, is_empty/1, head/1, tail/1, foreach/2,
+         map/2, nth/2, update/3]).
 -include("binary_forest.hrl").
 -include_lib("eunit/include/eunit.hrl").
 
@@ -40,8 +39,8 @@ map(Function, Forest = #forest{trees=Trees}) ->
 nth(N, Forest) -> nth_trees(N, Forest#forest.trees).
 
 
-% update(N, Value, Forest) ->
-%     Forest#forest{trees=update_trees(N, Value, Forest#forest.trees)}.
+update(N, Value, Forest) ->
+    Forest#forest{trees=update_trees(N, Value, Forest#forest.trees)}.
 
 
 
@@ -106,15 +105,17 @@ nth_tree(N, #tree{size=Size, left=L}) when N =< Size div 2 -> nth_tree(N, L);
 nth_tree(N, #tree{size=Size, right=R}) -> nth_tree(N - (Size div 2), R).
 
 
-% update_trees(N, Value, Trees) -> update_trees(N, Value, Trees, []).
-% update_trees(N, Value, [Tree = #tree{size=Size} | Trees], Out) when N > Size ->
-%     update_trees(N - Size, Value, Trees, [Tree | Out]);
-% update_trees(N, Value, [Tree | Trees], Out) ->
-%     lists:reverse([update_tree(N, Value, Tree) | Out]) ++ Trees.
+update_trees(N, Value, Trees) -> update_trees(N, Value, Trees, []).
+update_trees(N, Value, [Tree = #tree{size=Size} | Trees], Out) when N > Size ->
+    update_trees(N - Size, Value, Trees, [Tree | Out]);
+update_trees(N, Value, [Tree | Trees], Out) ->
+    lists:reverse([update_tree(N, Value, Tree) | Out]) ++ Trees.
 
-% update_tree(N, Value, Tree = #tree{values=Values}) ->
-%     {Before, [_Old | After]} = lists:split(N - 1, Values), % [1..N-1], [N..]
-%     Tree#tree{values=Before ++ [Value] ++ After}.
+update_tree(1, Value, Tree = #tree{size=1}) -> Tree#tree{value=Value};
+update_tree(N, Value, Tree = #tree{size=Size, left=L}) when N =< Size div 2 ->
+    Tree#tree{left=update_tree(N, Value, L)};
+update_tree(N, Value, Tree = #tree{size=Size, right=R}) ->
+    Tree#tree{right=update_tree(N - (Size div 2), Value, R)}.
 
 
 
@@ -193,8 +194,8 @@ nth_test() ->
     ok.
 
 
-% update_test() ->
-%     Original = create([1, 2, 3]),
-%     Modified = create([1, 7, 3]),
-%     Modified = update(2, 7, Original),
-%     ok.
+update_test() ->
+    Original = create([1, 2, 3]),
+    Modified = create([1, 7, 3]),
+    Modified = update(2, 7, Original),
+    ok.
