@@ -119,4 +119,6 @@ highest_power_of_2_test() ->
     16 = highest_power_of_2(17),
     16 = highest_power_of_2(16),
     8 = highest_power_of_2(15),
+    ?assert(0.0 =:= math:pow(2, 47) - highest_power_of_2(math:pow(2, 48) - 1)),
+    ?assertNot(0.0 =:= math:pow(2, 48) - highest_power_of_2(math:pow(2, 49) - 1)),
     ok.
