@@ -46,18 +46,30 @@ update(N, Value, Forest) ->
 
 %%% helpers
 
+%% Like lists:map, but apply the integer index (1..N) to the function first.
+mapi(Function, List) -> mapi(Function, List, 1).
+mapi(_Function, [], _Index) -> [];
+mapi(Function, [Head | Tail], Index) ->
+    [Function(Index, Head) | mapi(Function, Tail, Index + 1)].
+
+
 %% Split an integer into a list of bits, [LSB .. MSB].
 bits_of_integer(0) -> [];
 bits_of_integer(N) -> [N rem 2 | bits_of_integer(N bsr 1)].
 
 
+%% Nonzero powers of two, [Smallest .. Largest].
+powers_of_integer(N) ->
+    Powers = mapi(fun (I, Bit) -> Bit bsl (I - 1) end, bits_of_integer(N)),
+    [ Power || Power <- Powers, Power /= 0 ].
+
+
 %% Split a List into trees each of size 2^k, [Smallest .. Largest].
-trees(Length, List) -> trees(List, bits_of_integer(Length), 1).
-trees([], [], _Power2) -> [];
-trees(List, [0 | Bits], Power2) -> trees(List, Bits, Power2 bsl 1);
-trees(List, [1 | Bits], Power2) ->
-    {Values, Rest} = lists:split(Power2, List),
-    [tree(Power2, Values) | trees(Rest, Bits, Power2 bsl 1)].
+trees(Length, List) -> trees_(List, powers_of_integer(Length)).
+trees_([], []) -> [];
+trees_(List, [Power | Powers]) ->
+    {Values, Rest} = lists:split(Power, List),
+    [tree(Power, Values) | trees_(Rest, Powers)].
 
 
 %% Create a complete binary tree (and subtrees) with values in leaves.
@@ -123,4 +135,10 @@ update_tree(N, Value, Tree = #tree{size=Size, right=R}) ->
 bits_of_integer_test() ->
     [] = bits_of_integer(0),
     [1, 0, 1, 1] = bits_of_integer(13),
+    ok.
+
+powers_of_integer_test() ->
+    [] = powers_of_integer(0),
+    [1, 2, 4] = powers_of_integer(7),
+    [1, 16] = powers_of_integer(17),
     ok.
