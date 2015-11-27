@@ -8,7 +8,7 @@
 create() -> create([]).
 create(List) ->
     Size = length(List),
-    #forest{size=Size, trees=trees(Size, List, [])}.
+    #forest{size=Size, trees=trees(Size, List)}.
 
 
 cons(Element, #forest{size=Size, trees=Trees}) ->
@@ -46,16 +46,21 @@ update(N, Value, Forest) ->
 
 %%% helpers
 
-highest_power_of_2(N) -> trunc(math:pow(2, trunc(math:log2(N)))).
+%% Split an integer into a list of bits, [LSB .. MSB].
+bits_of_integer(0) -> [];
+bits_of_integer(N) -> [N rem 2 | bits_of_integer(N bsr 1)].
 
 
-%% Split a List of length Size into trees each of size 2^k.
-trees(_Length, [], Trees) -> Trees;
-trees(Length, List, Trees) ->
-    TreeSize = highest_power_of_2(Length),
-    {Rest, Values} = lists:split(Length - TreeSize, List), % take values off end
-    trees(Length - TreeSize, Rest, [tree(TreeSize, Values) | Trees]).
+%% Split a List into trees each of size 2^k, [Smallest .. Largest].
+trees(Length, List) -> trees(List, bits_of_integer(Length), 1).
+trees([], [], _Power2) -> [];
+trees(List, [0 | Bits], Power2) -> trees(List, Bits, Power2 bsl 1);
+trees(List, [1 | Bits], Power2) ->
+    {Values, Rest} = lists:split(Power2, List),
+    [tree(Power2, Values) | trees(Rest, Bits, Power2 bsl 1)].
 
+
+%% Create a complete binary tree (and subtrees) with values in leaves.
 tree(1, [Value]) -> #tree{size=1, value=Value};
 tree(Size, Values) ->
     HalfSize = Size div 2,
@@ -115,10 +120,7 @@ update_tree(N, Value, Tree = #tree{size=Size, right=R}) ->
 
 %% tests (non-exports)
 
-highest_power_of_2_test() ->
-    16 = highest_power_of_2(17),
-    16 = highest_power_of_2(16),
-    8 = highest_power_of_2(15),
-    ?assert(0.0 =:= math:pow(2, 47) - highest_power_of_2(math:pow(2, 48) - 1)),
-    ?assertNot(0.0 =:= math:pow(2, 48) - highest_power_of_2(math:pow(2, 49) - 1)),
+bits_of_integer_test() ->
+    [] = bits_of_integer(0),
+    [1, 0, 1, 1] = bits_of_integer(13),
     ok.
